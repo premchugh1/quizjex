@@ -42,7 +42,7 @@ export default function AvatarScreen({ navigation, route }) {
     if (!outfitCategory) return skin;
     if (outfitCategory === 'sports' && selectedNation) return `${selectedNation.flag} ${skin}`;
     if (outfitCategory === 'onesie' && selectedOnesie) return `${selectedOnesie.emoji}`;
-    const map = { superhero: '🦸', crown: '👑', glasses: '🕶️', space: '🚀', clown: '🤡', princess: '👸' };
+    const map = { superhero: '🦸', crown: '👑', space: '🚀', princess: '👸' };
     return map[outfitCategory] ? `${map[outfitCategory]} ${skin}` : skin;
   }
 

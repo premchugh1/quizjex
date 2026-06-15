@@ -127,9 +127,7 @@ export const OUTFIT_CATEGORIES = [
   { id: 'onesie', label: '🦁 Animal Onesie', icon: '🧸' },
   { id: 'superhero', label: '🦸 Superhero Cape', icon: '🦸' },
   { id: 'crown', label: '👑 Crown & Hat', icon: '👑' },
-  { id: 'glasses', label: '🕶️ Funny Glasses', icon: '🕶️' },
   { id: 'space', label: '🚀 Space Suit', icon: '🚀' },
-  { id: 'clown', label: '🤡 Clown Outfit', icon: '🤡' },
   { id: 'princess', label: '👸 Princess Dress', icon: '👸' },
 ];
 

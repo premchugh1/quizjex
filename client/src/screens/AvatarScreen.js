@@ -108,6 +108,8 @@ export default function AvatarScreen({ navigation, route }) {
   const visualStep  = step - firstStep + 1;
   const visualTotal = totalSteps;
   const progress    = visualStep / visualTotal;
+  const lastContentStep = isHost ? (needsSub ? 3 : 2) : (needsSub ? 4 : 3);
+  const isLastStep = step >= lastContentStep;
 
   return (
     <LinearGradient colors={GRAD.bg} style={g.fill}>
@@ -249,22 +251,23 @@ export default function AvatarScreen({ navigation, route }) {
           )}
 
           {error ? <Text style={[g.error, { marginTop: S.md, textAlign: 'center' }]}>{error}</Text> : null}
-          </ScrollView>
-        </Animated.View>
 
-        {/* Footer CTA */}
-        <View style={styles.footer}>
-          <TouchableOpacity style={styles.nextBtn} onPress={goNext} disabled={loading} activeOpacity={0.85}>
+          {/* Continue button INSIDE scroll so it's always reachable on mobile */}
+          <TouchableOpacity
+            style={[styles.nextBtn, { marginTop: S.lg, marginBottom: S.xl }]}
+            onPress={goNext}
+            disabled={loading}
+            activeOpacity={0.85}
+          >
             {loading
               ? <ActivityIndicator color={C.white} size="large" />
               : <Text style={styles.nextTxt}>
-                  {step === (isHost ? (needsSub ? 3 : 2) : (needsSub ? 4 : 3)) + 1 - 1
-                    ? (isHost ? '🚀 Create Room!' : '🎮 Join Game!')
-                    : 'Continue →'}
+                  {loading ? '' : isLastStep ? (isHost ? '🚀 Create Room!' : '🎮 Join Game!') : 'Continue →'}
                 </Text>
             }
           </TouchableOpacity>
-        </View>
+          </ScrollView>
+        </Animated.View>
 
       </SafeAreaView>
     </LinearGradient>
@@ -272,18 +275,18 @@ export default function AvatarScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  root:           { flex: 1 },
-  header:         { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: S.lg, paddingTop: S.md, paddingBottom: S.sm },
+  root:           { flex: 1, alignItems: 'center' },
+  header:         { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: S.lg, paddingTop: S.md, paddingBottom: S.sm, width: '100%', maxWidth: 560 },
   backBtn:        { padding: S.xs },
   backTxt:        { color: C.sub, fontSize: F.md, fontWeight: '700' },
   stepCount:      { color: C.sub, fontSize: F.sm, fontWeight: '700' },
   homeBtn:        { padding: S.xs },
   homeTxt:        { fontSize: F.lg },
-  progressTrack:  { height: 6, backgroundColor: C.card, marginHorizontal: S.lg, borderRadius: R.full, marginBottom: S.sm },
+  progressTrack:  { height: 6, backgroundColor: C.card, marginHorizontal: S.lg, borderRadius: R.full, marginBottom: S.sm, width: '100%', maxWidth: 560, alignSelf: 'center' },
   progressFill:   { height: 6, backgroundColor: C.purple, borderRadius: R.full },
   previewRow:     { alignItems: 'center', paddingVertical: S.sm },
   previewEmoji:   { fontSize: 60 },
-  contentWrap:    { flex: 1 },
+  contentWrap:    { flex: 1, width: '100%', maxWidth: 560, alignSelf: 'center' },
   content:        { paddingHorizontal: S.lg, paddingBottom: S.md },
   stepEmoji:      { fontSize: 48, textAlign: 'center', marginBottom: S.sm },
   stepQ:          { fontSize: 28, fontWeight: '900', color: C.white, textAlign: 'center', marginBottom: S.xs },

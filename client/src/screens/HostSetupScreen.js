@@ -207,18 +207,18 @@ export default function HostSetupScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  root:             { flex: 1 },
-  header:           { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: S.lg, paddingTop: S.md, paddingBottom: S.sm },
+  root:             { flex: 1, alignItems: 'center' },
+  header:           { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: S.lg, paddingTop: S.md, paddingBottom: S.sm, width: '100%', maxWidth: 560 },
   backBtn:          { padding: S.xs },
   backTxt:          { color: C.sub, fontSize: F.md, fontWeight: '700' },
   stepCount:        { color: C.sub, fontSize: F.sm, fontWeight: '700' },
   homeBtn:          { padding: S.xs },
   homeTxt:          { fontSize: F.lg },
 
-  progressTrack:    { height: 6, backgroundColor: C.card, marginHorizontal: S.lg, borderRadius: R.full, marginBottom: S.xl },
+  progressTrack:    { height: 6, backgroundColor: C.card, marginHorizontal: S.lg, borderRadius: R.full, marginBottom: S.xl, width: '100%', maxWidth: 560, alignSelf: 'center' },
   progressFill:     { height: 6, backgroundColor: C.purple, borderRadius: R.full },
 
-  content:          { flex: 1, paddingHorizontal: S.lg, paddingTop: S.sm },
+  content:          { flex: 1, paddingHorizontal: S.lg, paddingTop: S.sm, width: '100%', maxWidth: 560, alignSelf: 'center' },
   stepEmoji:        { fontSize: 64, textAlign: 'center', marginBottom: S.md },
   stepQuestion:     { fontSize: 32, fontWeight: '900', color: C.white, textAlign: 'center', marginBottom: S.sm, lineHeight: 40 },
   stepHint:         { fontSize: F.md, color: C.sub, textAlign: 'center', marginBottom: S.xl },
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   decorChipActive:  { backgroundColor: C.orange, borderColor: C.orange },
   decorTxt:         { color: C.white, fontSize: F.sm, fontWeight: '700' },
 
-  footer:           { padding: S.lg, paddingBottom: S.xl, gap: S.sm },
+  footer:           { padding: S.lg, paddingBottom: S.xl, gap: S.sm, width: '100%', maxWidth: 560, alignSelf: 'center' },
   skipBtn:          { alignItems: 'center', paddingVertical: S.sm },
   skipTxt:          { color: C.sub, fontSize: F.md, fontWeight: '700' },
   nextBtn:          { backgroundColor: C.orange, borderRadius: R.full, paddingVertical: 20, alignItems: 'center' },

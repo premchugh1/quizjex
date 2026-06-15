@@ -73,7 +73,7 @@ export default function LobbyScreen({ navigation, route }) {
   return (
     <LinearGradient colors={GRAD.bg} style={g.fill}>
       <SafeAreaView style={g.fill}>
-        <ScrollView contentContainerStyle={g.scroll}>
+        <ScrollView contentContainerStyle={g.scroll} style={{ alignSelf: 'center', width: '100%' }}>
           {/* Room code banner */}
           <View style={[g.card, styles.codeBanner]}>
             <Text style={styles.codeLabel}>🔑 Your Game Code</Text>

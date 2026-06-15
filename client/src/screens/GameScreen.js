@@ -216,13 +216,13 @@ export default function GameScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  screen:         { flex: 1, padding: S.md },
+  screen:         { flex: 1, padding: S.md, alignSelf: 'center', width: '100%', maxWidth: 600 },
   progressBar:    { height: 10, backgroundColor: C.card, borderRadius: R.full, marginBottom: S.xs },
   progressFill:   { height: 10, backgroundColor: C.purple, borderRadius: R.full },
   questionBox:    { marginBottom: S.lg, paddingVertical: S.lg, justifyContent: 'center' },
   questionTxt:    { color: C.white, fontSize: F.xl, fontWeight: '800', textAlign: 'center', lineHeight: 34 },
   optionsGrid:    { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: S.md },
-  optBtn:         { width: '48%', minHeight: 110, borderRadius: R.lg, padding: S.md, justifyContent: 'space-between', shadowColor: '#000', shadowOpacity: 0.4, shadowRadius: 6, shadowOffset: { width: 0, height: 4 } },
+  optBtn:         { width: '48%', minHeight: 90, borderRadius: R.lg, padding: S.md, justifyContent: 'space-between', shadowColor: '#000', shadowOpacity: 0.4, shadowRadius: 6, shadowOffset: { width: 0, height: 4 } },
   optLetterBadge: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'center', alignItems: 'center' },
   optSelected:    { borderWidth: 4, borderColor: C.white },
   optDimmed:      { opacity: 0.35 },

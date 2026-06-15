@@ -49,7 +49,7 @@ export default function JoinScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: S.lg },
+  container: { flex: 1, padding: S.lg, alignSelf: 'center', width: '100%', maxWidth: 560 },
   hint:      { marginBottom: S.xl },
   codeInput: {
     backgroundColor: C.card, color: C.white, borderRadius: R.lg, padding: S.lg,

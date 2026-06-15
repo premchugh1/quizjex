@@ -38,6 +38,6 @@ const styles = StyleSheet.create({
   title:   { fontSize: 60, fontWeight: '900', color: C.white, letterSpacing: 2, marginBottom: S.xs },
   sub:     { fontSize: F.md, marginBottom: S.xs },
   credit:  { fontSize: F.sm, color: C.purpleL, fontWeight: '700', marginBottom: S.xl, textAlign: 'center' },
-  btn:     { width: '100%', maxWidth: 340, marginTop: S.md },
+  btn:     { width: '100%', maxWidth: 400, marginTop: S.md },
   tagline: { position: 'absolute', bottom: 32, fontSize: F.xs, color: C.sub, textAlign: 'center' },
 });

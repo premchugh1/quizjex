@@ -1,4 +1,8 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+
+const W = Dimensions.get('window').width;
+// Cap content width on tablets — phone gets full width, tablet gets centred column
+export const MAX_W = 560;
 
 // ── Colour Palette ─────────────────────────────────────────────────────────
 // Edit this one place to retheme the entire app
@@ -50,10 +54,12 @@ export const R = { sm: 8, md: 14, lg: 20, full: 999 };
 // Import `g` and spread or reference these anywhere across screens
 export const g = StyleSheet.create({
   // Layout
-  fill:    { flex: 1 },
-  scroll:  { padding: 24, paddingBottom: 64 },
-  center:  { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  wrap:    { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  fill:      { flex: 1 },
+  scroll:    { padding: 24, paddingBottom: 64, alignSelf: 'center', width: '100%', maxWidth: MAX_W },
+  center:    { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  wrap:      { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  // Responsive page column — wrap ScrollView content with this
+  col:       { alignSelf: 'center', width: '100%', maxWidth: MAX_W },
 
   // Typography
   h1:      { fontSize: 36, fontWeight: '900', color: '#FFFFFF', marginBottom: 4 },

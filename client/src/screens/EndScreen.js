@@ -27,7 +27,7 @@ export default function EndScreen({ navigation, route }) {
   return (
     <LinearGradient colors={GRAD.bg} style={g.fill}>
       <SafeAreaView style={g.fill}>
-        <ScrollView contentContainerStyle={[g.scroll, { alignItems: 'center' }]}>
+        <ScrollView contentContainerStyle={[g.scroll, { alignItems: 'center' }]} style={{ alignSelf: 'center', width: '100%' }}>
           <Text style={[g.h1, { textAlign: 'center' }]}>🏆 Game Over!</Text>
           <Text style={[g.muted, { marginBottom: S.xl }]}>Total Questions: {totalQuestions} ⭐</Text>
 

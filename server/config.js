@@ -27,6 +27,9 @@ const config = {
     roomCloseDelaySec: 5,    // seconds before a host-abandoned room is deleted
   },
 
+  // ── Redis (optional — enables multi-instance + persistence) ──────────────
+  redisUrl: process.env.REDIS_URL || null,
+
   // ── CORS ──────────────────────────────────────────────────────────────────
   // Set to your deployed client URL in production, '*' for local dev
   clientOrigin: process.env.CLIENT_ORIGIN || '*',

@@ -160,7 +160,7 @@ export default function LobbyScreen({ navigation, route }) {
                   : players.length >= 3
                   ? `${players.length} players here — getting spicy 🌶️`
                   : players.length >= 2
-                  ? 'More friends are joining...'  
+                  ? 'More friends are joining...'
                   : 'Waiting for the host to start...'}
               </Text>
               {players.length > 1 && (
@@ -170,6 +170,12 @@ export default function LobbyScreen({ navigation, route }) {
                   ))}
                 </View>
               )}
+              <TouchableOpacity
+                style={styles.leaveBtn}
+                onPress={() => { socket.disconnect(); navigation.replace('Home'); }}
+              >
+                <Text style={styles.leaveTxt}>🚪 Leave game</Text>
+              </TouchableOpacity>
             </View>
           )}
         </ScrollView>
@@ -199,4 +205,6 @@ const styles = StyleSheet.create({
   waitingCard:  { marginTop: S.lg, alignItems: 'center', gap: S.sm },
   playerPips:   { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: S.xs, marginTop: S.xs },
   pip:          { fontSize: 28 },
+  leaveBtn:     { marginTop: S.md, paddingVertical: S.sm, paddingHorizontal: S.lg, borderRadius: R.full, borderWidth: 1, borderColor: C.border },
+  leaveTxt:     { color: C.sub, fontSize: F.sm, fontWeight: '700' },
 });

@@ -2,7 +2,8 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
-require('dotenv').config();
+const config = require('./config');
+const log = require('./logger');
 
 const app = express();
 app.use(cors());
@@ -10,7 +11,7 @@ app.use(express.json());
 
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
-  cors: { origin: '*', methods: ['GET', 'POST'] },
+  cors: { origin: config.clientOrigin, methods: ['GET', 'POST'] },
 });
 
 // In-memory room storage
@@ -39,17 +40,17 @@ const PLACEHOLDER_QUESTIONS = [
 ];
 
 async function generateQuestions(topic, count) {
-  if (process.env.AZURE_OPENAI_API_KEY) {
+  if (config.azure.apiKey) {
     try {
       const OpenAI = require('openai');
       const openai = new OpenAI({
-        apiKey: process.env.AZURE_OPENAI_API_KEY,
-        baseURL: `${process.env.AZURE_OPENAI_ENDPOINT}openai/deployments/${process.env.AZURE_OPENAI_DEPLOYMENT}`,
-        defaultHeaders: { 'api-key': process.env.AZURE_OPENAI_API_KEY },
-        defaultQuery: { 'api-version': process.env.AZURE_OPENAI_API_VERSION },
+        apiKey: config.azure.apiKey,
+        baseURL: `${config.azure.endpoint}openai/deployments/${config.azure.deployment}`,
+        defaultHeaders: { 'api-key': config.azure.apiKey },
+        defaultQuery: { 'api-version': config.azure.apiVersion },
       });
       const res = await openai.chat.completions.create({
-        model: process.env.AZURE_OPENAI_DEPLOYMENT,
+        model: config.azure.deployment,
         messages: [
           {
             role: 'system',
@@ -64,21 +65,26 @@ async function generateQuestions(topic, count) {
       });
       const parsed = JSON.parse(res.choices[0].message.content);
       const qs = Array.isArray(parsed) ? parsed : (parsed.questions || []);
-      if (qs.length > 0) return qs.slice(0, count);
+      if (qs.length > 0) {
+        log.info('AI questions generated', { topic, count: qs.length });
+        return qs.slice(0, count);
+      }
     } catch (e) {
-      console.error('⚠️  Azure OpenAI error, falling back to placeholder:', e.message);
+      log.error('Azure OpenAI failed — using placeholders', { message: e.message, stack: e.stack });
     }
   }
   // Shuffle placeholder and return requested count
+  log.warn('No Azure key or AI failed — serving placeholder questions', { topic, count });
   const shuffled = [...PLACEHOLDER_QUESTIONS].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, Math.min(count, shuffled.length));
 }
 
 io.on('connection', (socket) => {
-  console.log('🔌 Client connected:', socket.id);
+  log.info('Client connected', { socketId: socket.id });
 
   // ─── HOST: Create a room ─────────────────────────────────────────────────
   socket.on('createRoom', async ({ topic, questionCount, leaderboardStyle, decoration, nickname, avatar }) => {
+    log.info('createRoom request', { nickname, topic, questionCount, socketId: socket.id });
     socket.emit('loadingQuestions', { message: `🤖 Generating ${questionCount} questions about "${topic}"...` });
     try {
       const questions = await generateQuestions(topic, parseInt(questionCount, 10));
@@ -103,21 +109,25 @@ io.on('connection', (socket) => {
       socket.data.roomCode = code;
       socket.data.isHost = true;
 
+      log.info('Room created', { code, topic, questionCount: questions.length, host: nickname });
       socket.emit('roomCreated', { code, questionCount: questions.length });
     } catch (err) {
-      console.error(err);
+      log.error('createRoom failed', { message: err.message, stack: err.stack, nickname, topic });
       socket.emit('serverError', { message: '❌ Failed to create room. Please try again.' });
     }
   });
 
   // ─── PLAYER: Join a room ─────────────────────────────────────────────────
   socket.on('joinRoom', ({ code, nickname, avatar }) => {
+    log.info('joinRoom request', { code, nickname, socketId: socket.id });
     const room = rooms.get(code);
     if (!room) {
+      log.warn('joinRoom failed — room not found', { code, nickname, socketId: socket.id });
       socket.emit('joinError', { message: '❌ Room not found! Check your code.' });
       return;
     }
     if (room.gameState !== 'lobby') {
+      log.warn('joinRoom failed — game already started', { code, nickname, gameState: room.gameState, socketId: socket.id });
       socket.emit('joinError', { message: '⏳ Game already started! Try again next round.' });
       return;
     }
@@ -128,6 +138,7 @@ io.on('connection', (socket) => {
     socket.data.isHost = false;
 
     const playerList = Array.from(room.players.values());
+    log.info('Player joined lobby', { code, nickname, totalPlayers: room.players.size });
     io.to(code).emit('lobbyUpdate', { players: playerList });
     io.to(code).emit('playerJoined', { nickname, avatar, totalPlayers: room.players.size });
     socket.emit('joinSuccess', { code, players: playerList, decoration: room.decoration, topic: room.topic });
@@ -137,6 +148,7 @@ io.on('connection', (socket) => {
   socket.on('startGame', ({ code }) => {
     const room = rooms.get(code);
     if (!room || room.hostId !== socket.id) return;
+    log.info('Game started', { code, topic: room.topic, playerCount: room.players.size, players: Array.from(room.players.values()).map(p => p.nickname) });
 
     room.players.forEach((p) => { p.score = 0; });
     room.currentQIndex = 0;
@@ -151,6 +163,7 @@ io.on('connection', (socket) => {
     room.answers.clear();
     room.gameState = 'question';
     const q = room.questions[room.currentQIndex];
+    log.info('Question broadcast', { code: room.code, questionIndex: room.currentQIndex, total: room.questions.length, question: q.question });
     io.to(room.code).emit('newQuestion', {
       questionIndex: room.currentQIndex,
       totalQuestions: room.questions.length,
@@ -169,8 +182,9 @@ io.on('connection', (socket) => {
     const isCorrect = answer.toUpperCase() === q.correct.toUpperCase();
 
     room.answers.set(socket.id, { answer, isCorrect });
+    const player = room.players.get(socket.id);
+    log.info('Answer submitted', { code, nickname: player?.nickname, answer, isCorrect, questionIndex: room.currentQIndex });
     if (isCorrect) {
-      const player = room.players.get(socket.id);
       if (player) player.score += 1;
     }
 
@@ -183,7 +197,10 @@ io.on('connection', (socket) => {
 
     // Auto-reveal when all players have answered
     const allAnswered = Array.from(room.players.keys()).every((id) => room.answers.has(id));
-    if (allAnswered && room.players.size > 0) revealAndBroadcast(room);
+    if (allAnswered && room.players.size > 0) {
+      log.info('All players answered — auto-reveal', { code, questionIndex: room.currentQIndex });
+      revealAndBroadcast(room);
+    }
   });
 
   function revealAndBroadcast(room) {
@@ -239,6 +256,7 @@ io.on('connection', (socket) => {
     const sorted = Array.from(room.players.values())
       .sort((a, b) => b.score - a.score)
       .map((p) => ({ nickname: p.nickname, score: p.score, avatar: p.avatar }));
+    log.info('Game ended', { code: room.code, winner: sorted[0]?.nickname, finalScores: sorted });
     io.to(room.code).emit('gameEnded', { players: sorted, totalQuestions: room.questions.length });
   }
 
@@ -259,17 +277,20 @@ io.on('connection', (socket) => {
   });
 
   // ─── Disconnect handling ──────────────────────────────────────────────────
-  socket.on('disconnect', () => {
-    console.log('🔌 Client disconnected:', socket.id);
+  socket.on('disconnect', (reason) => {
     const code = socket.data?.roomCode;
+    log.info('Client disconnected', { socketId: socket.id, reason, roomCode: code || 'none' });
     if (!code) return;
     const room = rooms.get(code);
     if (!room) return;
 
     if (room.hostId === socket.id) {
+      log.warn('Host disconnected — closing room', { code, reason });
       io.to(code).emit('hostLeft', { message: '😢 The host left the game!' });
-      setTimeout(() => rooms.delete(code), 5000);
+      setTimeout(() => rooms.delete(code), config.game.roomCloseDelaySec * 1000);
     } else {
+      const leavingPlayer = room.players.get(socket.id);
+      log.info('Player left lobby', { code, nickname: leavingPlayer?.nickname });
       room.players.delete(socket.id);
       io.to(code).emit('lobbyUpdate', { players: Array.from(room.players.values()) });
     }
@@ -278,8 +299,9 @@ io.on('connection', (socket) => {
 
 app.get('/health', (_, res) => res.json({ ok: true, rooms: rooms.size }));
 
-const PORT = process.env.PORT || 3001;
-httpServer.listen(PORT, () => {
-  console.log(`🎮 QuizJex server running on http://localhost:${PORT}`);
-  console.log(`🤖 AI Questions: ${process.env.AZURE_OPENAI_API_KEY ? '✅ Azure OpenAI connected' : '⚠️  No API key — using placeholder questions'}`);
+httpServer.listen(config.port, () => {
+  log.info('QuizJex server started', { port: config.port, logFile: log.filePath });
+  log.info(`Azure OpenAI: ${config.azure.apiKey ? 'connected' : 'not configured — using placeholders'}`);
+  console.log(`\n🎮 QuizJex running on http://localhost:${config.port}`);
+  console.log(`📄 Logging to: ${log.filePath}\n`);
 });

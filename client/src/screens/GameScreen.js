@@ -125,32 +125,43 @@ export default function GameScreen({ navigation, route }) {
 
   // ── FEEDBACK PHASE ──────────────────────────────────────────────────────────
   if (phase === 'feedback' && feedback) {
+    const correctIndex = OPT_LABELS.indexOf(feedback.correctAnswer.toUpperCase());
+    const correctOptionText = question?.options?.[correctIndex]?.replace(/^[A-D]\.\s?/, '') || feedback.correctAnswer;
+
     return (
       <LinearGradient colors={feedback.isCorrect ? GRAD.correct : GRAD.wrong} style={g.fill}>
-        <SafeAreaView style={g.center}>
+        <SafeAreaView style={[g.center, { paddingHorizontal: S.lg }]}>
           <Animated.Text style={[styles.reactionEmoji, { transform: [{ translateY: bounceAnim }] }]}>
             {feedback.isCorrect ? '🕺' : '💩'}
           </Animated.Text>
-          <Text style={[g.h2, { textAlign: 'center', marginBottom: S.sm }]}>
-            {feedback.isCorrect ? '🎉 Correct! +1 point!' : '😂 Wrong answer!'}
+
+          <Text style={styles.feedbackHeading}>
+            {feedback.isCorrect ? '🎉 YES! That\'s right!' : '😬 Oops! Not quite...'}
           </Text>
-          <Text style={[g.muted, { textAlign: 'center', paddingHorizontal: S.lg, marginBottom: S.md }]}>
-            {feedback.explanation}
-          </Text>
-          <Text style={[g.muted, { marginBottom: S.xl }]}>
-            Correct answer:{' '}
-            <Text style={{ color: C.white, fontWeight: '900', fontSize: F.lg }}>{feedback.correctAnswer}</Text>
-          </Text>
+
+          {/* Correct answer — big and obvious */}
+          <View style={styles.correctAnswerBox}>
+            <Text style={styles.correctAnswerLabel}>
+              {feedback.isCorrect ? '✅ You said:' : '✅ The right answer was:'}
+            </Text>
+            <Text style={styles.correctAnswerText}>{correctOptionText}</Text>
+          </View>
+
+          {/* Explanation — short, fun, big enough to read */}
+          <Text style={styles.explanationTxt}>{feedback.explanation}</Text>
+
           {isHost && (
             <TouchableOpacity
-              style={[g.btn, { backgroundColor: C.orange, paddingHorizontal: S.xl }]}
+              style={[g.btn, { backgroundColor: C.orange, paddingHorizontal: S.xl, marginTop: S.lg }]}
               onPress={() => socket.emit('nextQuestion', { code: roomCode })}
               activeOpacity={0.85}
             >
               <Text style={g.btnText}>Next Question →</Text>
             </TouchableOpacity>
           )}
-          {!isHost && <Text style={[g.muted, { textAlign: 'center' }]}>⏳ Waiting for host...</Text>}
+          {!isHost && (
+            <Text style={[g.muted, { textAlign: 'center', marginTop: S.lg }]}>⏳ Waiting for host...</Text>
+          )}
         </SafeAreaView>
       </LinearGradient>
     );
@@ -193,6 +204,13 @@ export default function GameScreen({ navigation, route }) {
     <LinearGradient colors={GRAD.bg} style={g.center}>
       <Text style={styles.reactionEmoji}>🎮</Text>
       <Text style={g.h2}>Game starting...</Text>
+      <TouchableOpacity
+        style={[g.btn, { backgroundColor: C.border, marginTop: S.xl, paddingHorizontal: S.xl }]}
+        onPress={() => { socket.disconnect(); navigation.replace('Home'); }}
+        activeOpacity={0.85}
+      >
+        <Text style={[g.btnText, { fontSize: F.md }]}>🏠 Go Home</Text>
+      </TouchableOpacity>
     </LinearGradient>
   );
 }
@@ -210,7 +228,12 @@ const styles = StyleSheet.create({
   optDimmed:      { opacity: 0.35 },
   optLetter:      { fontSize: F.sm, fontWeight: '900', color: C.white },
   optTxt:         { color: C.white, fontSize: F.md, fontWeight: '800', lineHeight: 22, marginTop: S.xs },
-  reactionEmoji:{ fontSize: 100, marginBottom: S.md },
+  reactionEmoji:    { fontSize: 100, marginBottom: S.md },
+  feedbackHeading:  { fontSize: F.xxl, fontWeight: '900', color: C.white, textAlign: 'center', marginBottom: S.lg },
+  correctAnswerBox: { backgroundColor: 'rgba(0,0,0,0.25)', borderRadius: R.lg, padding: S.md, alignItems: 'center', marginBottom: S.md, width: '100%' },
+  correctAnswerLabel:{ color: 'rgba(255,255,255,0.7)', fontSize: F.sm, fontWeight: '700', marginBottom: S.xs },
+  correctAnswerText: { color: C.white, fontSize: F.xl, fontWeight: '900', textAlign: 'center' },
+  explanationTxt:   { color: 'rgba(255,255,255,0.85)', fontSize: F.md, textAlign: 'center', lineHeight: 26, fontWeight: '600' },
   leaderRow:    { flexDirection: 'row', alignItems: 'center', marginBottom: S.sm, gap: S.sm },
   leaderFirst:  { backgroundColor: '#3d2b00', borderColor: C.orange },
   leaderRank:   { fontSize: F.xl, width: 36 },

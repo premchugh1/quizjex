@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ActivityIndicator, ScrollView, Animated } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ActivityIndicator, ScrollView, Animated, KeyboardAvoidingView, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SPORTS, OUTFIT_CATEGORIES, ONESIE_OPTIONS } from '../data/gameData';
 import { C, F, S, R, GRAD, g } from '../theme';
@@ -134,8 +134,13 @@ export default function AvatarScreen({ navigation, route }) {
           <Text style={styles.previewEmoji}>{getAvatarSummary()}</Text>
         </View>
 
-        {/* Step content */}
-        <Animated.View style={[styles.content, { transform: [{ translateY: slideAnim }] }]}>
+        {/* Step content — scrollable so outfit grid never hides the button */}
+        <Animated.View style={[styles.contentWrap, { transform: [{ translateY: slideAnim }] }]}>
+          <ScrollView
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
 
           {/* STEP 0 — Nickname (joiners only) */}
           {step === 0 && (
@@ -244,6 +249,7 @@ export default function AvatarScreen({ navigation, route }) {
           )}
 
           {error ? <Text style={[g.error, { marginTop: S.md, textAlign: 'center' }]}>{error}</Text> : null}
+          </ScrollView>
         </Animated.View>
 
         {/* Footer CTA */}
@@ -275,9 +281,10 @@ const styles = StyleSheet.create({
   homeTxt:        { fontSize: F.lg },
   progressTrack:  { height: 6, backgroundColor: C.card, marginHorizontal: S.lg, borderRadius: R.full, marginBottom: S.sm },
   progressFill:   { height: 6, backgroundColor: C.purple, borderRadius: R.full },
-  previewRow:     { alignItems: 'center', paddingVertical: S.md },
-  previewEmoji:   { fontSize: 80 },
-  content:        { flex: 1, paddingHorizontal: S.lg, paddingBottom: S.sm },
+  previewRow:     { alignItems: 'center', paddingVertical: S.sm },
+  previewEmoji:   { fontSize: 60 },
+  contentWrap:    { flex: 1 },
+  content:        { paddingHorizontal: S.lg, paddingBottom: S.md },
   stepEmoji:      { fontSize: 48, textAlign: 'center', marginBottom: S.sm },
   stepQ:          { fontSize: 28, fontWeight: '900', color: C.white, textAlign: 'center', marginBottom: S.xs },
   stepHint:       { fontSize: F.sm, color: C.sub, textAlign: 'center', marginBottom: S.lg },

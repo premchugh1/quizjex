@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QuizJex — Reyaan's Game Guide 🎮</title>
+<style>
+  :root {
+    --bg: #0D1B2A;
+    --card: #162032;
+    --border: #243650;
+    --purple: #7C3AED;
+    --purpleL: #A78BFA;
+    --orange: #F97316;
+    --teal: #0EA5E9;
+    --green: #22C55E;
+    --gold: #F59E0B;
+    --white: #FFFFFF;
+    --sub: #94A3B8;
+    --red: #C0392B;
+    --blue: #2472B5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #1a0a3d 0%, #0D1B2A 50%, #0a2540 100%);
+    text-align: center;
+    padding: 60px 24px 48px;
+    border-bottom: 2px solid var(--border);
+  }
+  .hero-emoji { font-size: 80px; display: block; margin-bottom: 12px; }
+  .hero h1 { font-size: 56px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(90deg, var(--orange), var(--purpleL)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero .tagline { color: var(--sub); font-size: 18px; margin-top: 8px; }
+  .hero .credit { color: var(--purpleL); font-size: 16px; font-weight: 700; margin-top: 6px; }
+  .hero .date { color: var(--sub); font-size: 13px; margin-top: 16px; }
+
+  /* STATUS BADGES */
+  .status-bar {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+    padding: 32px 24px; border-bottom: 1px solid var(--border);
+  }
+  .badge {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 999px; padding: 8px 18px; font-size: 14px; font-weight: 700;
+  }
+  .badge.done  { border-color: var(--green);  color: var(--green); }
+  .badge.in    { border-color: var(--orange); color: var(--orange); }
+  .badge.todo  { border-color: var(--border); color: var(--sub); }
+
+  /* SECTION */
+  .section { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+  .section-title {
+    font-size: 28px; font-weight: 900; margin-bottom: 32px;
+    padding-bottom: 12px; border-bottom: 2px solid var(--border);
+  }
+
+  /* SCREEN CARDS */
+  .screens { display: flex; flex-direction: column; gap: 48px; }
+  .screen-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .screen-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px 24px;
+    background: rgba(124,58,237,0.12);
+    border-bottom: 1px solid var(--border);
+  }
+  .screen-num {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--purple); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 900; flex-shrink: 0;
+  }
+  .screen-name { font-size: 22px; font-weight: 900; }
+  .screen-role { margin-left: auto; font-size: 12px; font-weight: 700;
+    background: rgba(124,58,237,0.25); color: var(--purpleL);
+    border-radius: 999px; padding: 4px 12px; }
+
+  .screen-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  @media(max-width:680px) { .screen-body { grid-template-columns: 1fr; } }
+
+  .screen-info { padding: 24px; border-right: 1px solid var(--border); }
+  .screen-info h3 { font-size: 13px; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .screen-info p { color: var(--sub); font-size: 14px; margin-bottom: 16px; }
+  .step-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .step-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 14px; color: var(--white);
+  }
+  .step-list .num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--purple); color: var(--white);
+    font-size: 11px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* MOCK SCREEN */
+  .mock {
+    padding: 20px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .phone {
+    width: 100%; max-width: 320px;
+    background: #0a1422;
+    border: 2px solid var(--border);
+    border-radius: 24px;
+    padding: 20px;
+    font-size: 13px;
+    min-height: 280px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px;
+    text-align: center;
+  }
+  .phone .p-title { font-size: 28px; font-weight: 900; }
+  .phone .p-sub { color: var(--sub); font-size: 12px; }
+  .phone .p-btn {
+    width: 100%; padding: 14px;
+    border-radius: 999px; font-weight: 800; font-size: 14px; border: none;
+    cursor: default; color: white;
+  }
+  .p-btn.orange { background: var(--orange); }
+  .p-btn.teal   { background: var(--teal); }
+  .p-btn.purple { background: var(--purple); }
+  .p-progress { width: 100%; height: 6px; background: var(--border); border-radius: 999px; margin-bottom: 4px; }
+  .p-progress-fill { height: 6px; background: var(--purple); border-radius: 999px; }
+  .p-code { font-size: 44px; font-weight: 900; letter-spacing: 10px; border: 2px solid var(--purple); border-radius: 12px; padding: 12px 20px; width: 100%; }
+  .p-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; width: 100%; }
+  .p-opt {
+    width: 100%; padding: 14px 12px; border-radius: 12px;
+    font-weight: 800; font-size: 13px; color: white; text-align: left;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .p-opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+  .opt-badge { width: 24px; height: 24px; border-radius: 50%; background: rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; flex-shrink: 0; }
+  .p-skin-row { display: flex; gap: 8px; justify-content: center; }
+  .p-skin { width: 44px; height: 44px; border-radius: 10px; background: var(--card); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .p-skin.active { border-color: var(--purpleL); background: #1e1060; }
+  .podium-row { display: flex; align-items: flex-end; justify-content: center; gap: 8px; width: 100%; }
+  .podium-block { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .podium-bar { width: 60px; border-radius: 8px 8px 0 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #000; }
+
+  /* FLOW DIAGRAM */
+  .flow {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: 8px; padding: 32px 24px;
+    background: var(--card); border-radius: 20px;
+    border: 1px solid var(--border); margin-bottom: 40px;
+  }
+  .flow-step {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 16px;
+    font-size: 13px; font-weight: 700; text-align: center;
+  }
+  .flow-step.active { border-color: var(--purple); color: var(--purpleL); }
+  .flow-arrow { color: var(--sub); font-size: 18px; }
+
+  /* TECH STACK */
+  .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 40px; }
+  .tech-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 20px; text-align: center;
+  }
+  .tech-card .t-icon { font-size: 36px; margin-bottom: 8px; }
+  .tech-card .t-name { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .tech-card .t-desc { color: var(--sub); font-size: 12px; }
+
+  /* CHECKLIST */
+  .checklist { display: flex; flex-direction: column; gap: 10px; }
+  .check-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 18px;
+    font-size: 14px; font-weight: 600;
+  }
+  .check-item.done { border-left: 4px solid var(--green); }
+  .check-item.todo { border-left: 4px solid var(--border); color: var(--sub); }
+  .check-icon { font-size: 18px; flex-shrink: 0; }
+
+  /* FOOTER */
+  footer {
+    text-align: center; padding: 40px 24px;
+    border-top: 1px solid var(--border);
+    color: var(--sub); font-size: 13px;
+  }
+  footer strong { color: var(--purpleL); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="hero">
+  <span class="hero-emoji">🎮</span>
+  <h1>QuizJex</h1>
+  <p class="tagline">The ultimate kids quiz game powered by AI 🤖</p>
+  <p class="credit">Made by Reyaan 💛 to play with Goraansh</p>
+  <p class="date">Progress Report — June 2026</p>
+</div>
+
+<!-- ═══════════════ STATUS BADGES ═══════════════ -->
+<div class="status-bar">
+  <div class="badge done">✅ Home Screen</div>
+  <div class="badge done">✅ Host Setup Wizard</div>
+  <div class="badge done">✅ Join Screen</div>
+  <div class="badge done">✅ Avatar Builder</div>
+  <div class="badge done">✅ Lobby</div>
+  <div class="badge done">✅ Quiz Game</div>
+  <div class="badge done">✅ Winner Podium</div>
+  <div class="badge done">✅ AI Questions (Azure)</div>
+  <div class="badge done">✅ Multiplayer (Socket.IO)</div>
+  <div class="badge in">🔄 Azure Deployment</div>
+  <div class="badge todo">⏳ Fart Sound 💩</div>
+  <div class="badge todo">⏳ Room Animations</div>
+</div>
+
+<!-- ═══════════════ GAME FLOW ═══════════════ -->
+<div class="section">
+  <div class="section-title">🗺️ How the Game Flows</div>
+  <div class="flow">
+    <div class="flow-step active">🏠 Home</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">👑 Host Setup<br><small>(5 steps)</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">🧍 Avatar<br><small>(4 steps)</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">🚪 Lobby</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">❓ Quiz Game</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">🏆 Podium</div>
+  </div>
+  <div class="flow" style="margin-bottom:0">
+    <div class="flow-step active">🏠 Home</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">🎮 Join Screen</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">🧍 Avatar<br><small>(5 steps)</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">🚪 Lobby</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">❓ Quiz Game</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">🏆 Podium</div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREENS ═══════════════ -->
+<div class="section">
+  <div class="section-title">📱 Every Screen Explained</div>
+  <div class="screens">
+
+    <!-- 1. HOME -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-num">1</div>
+        <div class="screen-name">🏠 Home Screen</div>
+        <div class="screen-role">Everyone</div>
+      </div>
+      <div class="screen-body">
+        <div class="screen-info">
+          <h3>What it does</h3>
+          <p>The very first screen you see when you open the game. Two big buttons — one for the person running the quiz (Host) and one for everyone joining.</p>
+          <h3>Steps</h3>
+          <ul class="step-list">
+            <li><span class="num">1</span> Open <strong>localhost:8081</strong> in your browser</li>
+            <li><span class="num">2</span> If you're running the quiz → tap <strong>👑 Host a Game</strong></li>
+            <li><span class="num">3</span> If your friend is hosting → tap <strong>🎮 Join a Game</strong></li>
+          </ul>
+        </div>
+        <div class="mock">
+          <div class="phone">
+            <span style="font-size:60px">🎮</span>
+            <div class="p-title">QuizJex</div>
+            <div class="p-sub">The ultimate kids quiz game! 🌈</div>
+            <div class="p-sub" style="color:#A78BFA;font-weight:700">Made by Reyaan 💛 to play with Goraansh</div>
+            <button class="p-btn orange" style="margin-top:8px">👑 Host a Game</button>
+            <button class="p-btn teal">🎮 Join a Game</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. HOST SETUP -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-num">2</div>
+        <div class="screen-name">👑 Host Setup — 5-Step Wizard</div>
+        <div class="screen-role">Host only</div>
+      </div>
+      <div class="screen-body">
+        <div class="screen-info">
+          <h3>What it does</h3>
+          <p>Asks the host 5 simple questions one at a time — like a wizard! A purple progress bar shows how far you are. Each question is big and easy to read.</p>
+          <h3>The 5 Steps</h3>
+          <ul class="step-list">
+            <li><span class="num">1</span> 🎯 <strong>Quiz topic</strong> — e.g. "FIFA World Cup", "Animals", "Harry Potter"</li>
+            <li><span class="num">2</span> 🎭 <strong>Your nickname</strong> — what other players see</li>
+            <li><span class="num">3</span> 📝 <strong>Number of questions</strong> — pick 5 to 10</li>
+            <li><span class="num">4</span> 📊 <strong>When to show scores</strong> — after each question or only at the end</li>
+            <li><span class="num">5</span> 🎨 <strong>Room decorations</strong> — optional fun stickers for the lobby</li>
+          </ul>
+        </div>
+        <div class="mock">
+          <div class="phone">
+            <div style="width:100%;display:flex;justify-content:space-between;font-size:12px;color:#94A3B8;margin-bottom:4px">
+              <span>← Back</span><span>Step 1 of 5</span><span>🏠</span>
+            </div>
+            <div class="p-progress"><div class="p-progress-fill" style="width:20%"></div></div>
+            <span style="font-size:48px;margin-top:12px">🎯</span>
+            <div class="p-title" style="font-size:22px">What's the quiz about?</div>
+            <div class="p-sub">e.g. FIFA World Cup, Animals…</div>
+            <div style="width:100%;background:#162032;border:2px solid #7C3AED;border-radius:12px;padding:14px;color:#94A3B8;font-size:14px;text-align:center;margin-top:8px">
+              Type your topic here...
+            </div>
+            <button class="p-btn orange" style="margin-top:12px;border-radius:999px">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. JOIN SCREEN -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-num">3</div>
+        <div class="screen-name">🎮 Join Screen</div>
+        <div class="screen-role">Players only</div>
+      </div>
+      <div class="screen-body">
+        <div class="screen-info">
+          <h3>What it does</h3>
+          <p>Players who aren't hosting type in the 4-digit room code that the host shows them in the lobby.</p>
+          <h3>Steps</h3>
+          <ul class="step-list">
+            <li><span class="num">1</span> Ask the host for their <strong>4-digit code</strong></li>
+            <li><span class="num">2</span> Type the code into the big box</li>
+            <li><span class="num">3</span> Tap <strong>Next: Pick Your Avatar</strong></li>
+          </ul>
+        </div>
+        <div class="mock">
+          <div class="phone">
+            <span style="font-size:48px">🎮</span>
+            <div class="p-title" style="font-size:22px">Join a Game</div>
+            <div class="p-sub">Ask the host for their room code!</div>
+            <div style="width:100%;background:#162032;border:2px solid #243650;border-radius:12px;padding:18px;color:#94A3B8;font-size:28px;font-weight:900;text-align:center;letter-spacing:12px;margin-top:8px">
+              ????
+            </div>
+            <button class="p-btn teal" style="border-radius:999px;margin-top:12px">Next: Pick Your Avatar 🧍 →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. AVATAR BUILDER -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-num">4</div>
+        <div class="screen-name">🧍 Avatar Builder — Step by Step</div>
+        <div class="screen-role">Everyone</div>
+      </div>
+      <div class="screen-body">
+        <div class="screen-info">
+          <h3>What it does</h3>
+          <p>Each player builds their own character one step at a time. A live preview at the top updates as you pick things. Hosts skip the nickname step.</p>
+          <h3>The Steps</h3>
+          <ul class="step-list">
+            <li><span class="num">1</span> 🎭 <strong>Nickname</strong> (joining players only)</li>
+            <li><span class="num">2</span> 🎨 <strong>Skin tone</strong> — 6 options</li>
+            <li><span class="num">3</span> 👕 <strong>Outfit</strong> — Sports Shirt, Superhero, Onesie, Crown, Glasses, Space Suit, Clown, Princess</li>
+            <li><span class="num">4</span> 🌍 <strong>Country / Onesie animal</strong> — only if you picked Sports or Onesie</li>
+            <li><span class="num">5</span> 🚀 <strong>Create/Join!</strong> — room is created with AI questions</li>
+          </ul>
+        </div>
+        <div class="mock">
+          <div class="phone">
+            <div style="width:100%;display:flex;justify-content:space-between;font-size:12px;color:#94A3B8;margin-bottom:4px">
+              <span>← Back</span><span>Step 2 of 4</span><span>🏠</span>
+            </div>
+            <div class="p-progress"><div class="p-progress-fill" style="width:50%"></div></div>
+            <span style="font-size:64px;margin:8px 0">🧑</span>
+            <span style="font-size:40px">🎨</span>
+            <div class="p-title" style="font-size:20px">Pick your skin tone</div>
+            <div class="p-skin-row" style="margin-top:8px">
+              <div class="p-skin active">🧑</div>
+              <div class="p-skin">🧑🏻</div>
+              <div class="p-skin">🧑🏽</div>
+              <div class="p-skin">🧑🏾</div>
+              <div class="p-skin">🧑🏿</div>
+            </div>
+            <button class="p-btn purple" style="border-radius:999px;margin-top:12px">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. LOBBY -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-num">5</div>
+        <div class="screen-name">🚪 Lobby — Waiting Room</div>
+        <div class="screen-role">Everyone</div>
+      </div>
+      <div class="screen-body">
+        <div class="screen-info">
+          <h3>What it does</h3>
+          <p>After creating a room, everyone waits here. The big 4-digit code is shown so friends can join. Live activity messages pop up as each person joins — "Goraansh just joined the party! 🎉"</p>
+          <h3>For the Host</h3>
+          <ul class="step-list">
+            <li><span class="num">1</span> Share the big code with your friends</li>
+            <li><span class="num">2</span> Watch their avatars appear in the grid</li>
+            <li><span class="num">3</span> When everyone is in, tap <strong>🚀 Everyone's in — Start!</strong></li>
+          </ul>
+          <h3 style="margin-top:16px">For Players</h3>
+          <ul class="step-list">
+            <li><span class="num">1</span> You see <strong>"You're in!"</strong> and your friends' avatars</li>
+            <li><span class="num">2</span> Wait for the host to start</li>
+            <li><span class="num">3</span> You can tap 🚪 Leave game to go back</li>
+          </ul>
+        </div>
+        <div class="mock">
+          <div class="phone">
+            <div style="color:#A78BFA;font-size:12px;font-weight:800;margin-bottom:4px">🔑 Your Game Code</div>
+            <div class="p-code">4 1 2 2</div>
+            <div class="p-card" style="margin-top:10px;text-align:left">
+              <div style="font-weight:800;font-size:13px;margin-bottom:6px">👋 Tell your friends to...</div>
+              <div style="font-size:12px;color:#94A3B8;display:flex;flex-direction:column;gap:4px">
+                <span>① Open <strong style="color:white">localhost:8081</strong></span>
+                <span>② Tap <strong style="color:white">🎮 Join a Game</strong></span>
+                <span>③ Type the code <strong style="color:white">4122</strong></span>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:10px">
+              <div style="background:#162032;border:2px solid #A78BFA;border-radius:12px;padding:8px;text-align:center;flex:1">
+                <span style="font-size:24px">🧑</span><br>
+                <span style="font-size:11px;font-weight:700">Prem</span><br>
+                <span style="font-size:10px;color:#A78BFA">👑 Host</span>
+              </div>
+              <div style="background:#162032;border:1px solid #243650;border-radius:12px;padding:8px;text-align:center;flex:1">
+                <span style="font-size:24px">🧑🏽</span><br>
+                <span style="font-size:11px;font-weight:700">Goru</span>
+              </div>
+            </div>
+            <button class="p-btn orange" style="border-radius:999px;margin-top:10px;font-size:13px">🚀 Everyone's in — Start!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. GAME -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-num">6</div>
+        <div class="screen-name">❓ Quiz Game Screen</div>
+        <div class="screen-role">Everyone</div>
+      </div>
+      <div class="screen-body">
+        <div class="screen-info">
+          <h3>What it does</h3>
+          <p>The AI (Azure OpenAI / gpt-4.1) has already made questions about your topic. Each question has 4 coloured answer buttons in a 2×2 grid — just like Kahoot!</p>
+          <h3>How to play</h3>
+          <ul class="step-list">
+            <li><span class="num">1</span> Read the question at the top</li>
+            <li><span class="num">2</span> Tap one of the 4 coloured buttons — <span style="color:#C0392B">■</span> A, <span style="color:#2472B5">■</span> B, <span style="color:#1E8449">■</span> C, <span style="color:#CA6F1E">■</span> D</li>
+            <li><span class="num">3</span> Instantly see if you got it right!</li>
+            <li><span class="num">4</span> ✅ Correct → 🕺 dance animation, +1 point</li>
+            <li><span class="num">5</span> ❌ Wrong → 💩 poop animation + the right answer is shown</li>
+            <li><span class="num">6</span> Host taps <strong>Next Question →</strong> to continue</li>
+          </ul>
+        </div>
+        <div class="mock">
+          <div class="phone">
+            <div style="width:100%;display:flex;justify-content:space-between;font-size:11px;color:#94A3B8">
+              <span>Question 2 / 5</span>
+            </div>
+            <div class="p-progress" style="margin-bottom:12px"><div class="p-progress-fill" style="width:40%"></div></div>
+            <div class="p-card" style="margin-bottom:12px">
+              <div style="font-size:15px;font-weight:800;text-align:center">⚽ How many players are in a football team?</div>
+            </div>
+            <div class="p-opt-grid">
+              <div class="p-opt" style="background:#C0392B"><span class="opt-badge">A</span> 9</div>
+              <div class="p-opt" style="background:#2472B5"><span class="opt-badge">B</span> 10</div>
+              <div class="p-opt" style="background:#1E8449;border:3px solid white"><span class="opt-badge">C</span> 11 ✓</div>
+              <div class="p-opt" style="background:#CA6F1E;opacity:0.4"><span class="opt-badge">D</span> 12</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. FEEDBACK -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-num">7</div>
+        <div class="screen-name">🎉 Answer Feedback Screen</div>
+        <div class="screen-role">Everyone</div>
+      </div>
+      <div class="screen-body">
+        <div class="screen-info">
+          <h3>What it does</h3>
+          <p>After you answer, the whole screen changes colour and shows a big fun reaction. The correct answer is shown in full — not just the letter!</p>
+          <h3>Correct answer 🟢</h3>
+          <ul class="step-list">
+            <li><span class="num">✓</span> Screen goes <strong>green</strong></li>
+            <li><span class="num">✓</span> Big 🕺 dancer bounces up and down</li>
+            <li><span class="num">✓</span> "YES! That's right!" message</li>
+          </ul>
+          <h3 style="margin-top:16px">Wrong answer 🔴</h3>
+          <ul class="step-list">
+            <li><span class="num">✗</span> Screen goes <strong>red</strong></li>
+            <li><span class="num">✗</span> Big 💩 poop bounces</li>
+            <li><span class="num">✗</span> Shows the correct answer in full</li>
+            <li><span class="num">✗</span> Fun explanation of why!</li>
+          </ul>
+        </div>
+        <div class="mock">
+          <div class="phone" style="background:linear-gradient(135deg,#7F1D1D,#991B1B);">
+            <span style="font-size:80px">💩</span>
+            <div style="font-size:22px;font-weight:900">😬 Oops! Not quite...</div>
+            <div style="width:100%;background:rgba(0,0,0,0.25);border-radius:12px;padding:12px;text-align:center">
+              <div style="font-size:11px;color:rgba(255,255,255,0.7);font-weight:700;margin-bottom:4px">✅ The right answer was:</div>
+              <div style="font-size:16px;font-weight:900">11 players per team</div>
+            </div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:600">11 players per team on the pitch! ⚽</div>
+            <button class="p-btn orange" style="border-radius:999px;margin-top:8px">Next Question →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. END SCREEN -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-num">8</div>
+        <div class="screen-name">🏆 Winner Podium</div>
+        <div class="screen-role">Everyone</div>
+      </div>
+      <div class="screen-body">
+        <div class="screen-info">
+          <h3>What it does</h3>
+          <p>When all questions are done, everyone sees a winner podium — just like the Olympics! 1st place is in the middle on the tallest block.</p>
+          <h3>On this screen</h3>
+          <ul class="step-list">
+            <li><span class="num">1</span> 🥇 1st place — centre, tallest gold block</li>
+            <li><span class="num">2</span> 🥈 2nd place — left, silver block</li>
+            <li><span class="num">3</span> 🥉 3rd place — right, bronze block</li>
+            <li><span class="num">4</span> Everyone else shown below in order</li>
+            <li><span class="num">5</span> Host can tap <strong>Play Again</strong> for another round!</li>
+          </ul>
+        </div>
+        <div class="mock">
+          <div class="phone">
+            <div style="font-size:24px;font-weight:900">🏆 Game Over!</div>
+            <div style="color:#94A3B8;font-size:12px;margin-bottom:12px">Total Questions: 5 ⭐</div>
+            <div class="podium-row" style="align-items:flex-end">
+              <div class="podium-block">
+                <span style="font-size:28px">🧑🏽</span>
+                <span style="font-size:16px">🥈</span>
+                <span style="font-size:11px;font-weight:700">Goru</span>
+                <div class="podium-bar" style="height:70px;background:#94A3B8">3pts</div>
+              </div>
+              <div class="podium-block">
+                <span style="font-size:28px">🦸 🧑</span>
+                <span style="font-size:16px">🥇</span>
+                <span style="font-size:11px;font-weight:700">Prem</span>
+                <div class="podium-bar" style="height:100px;background:#F59E0B">5pts</div>
+              </div>
+              <div class="podium-block">
+                <span style="font-size:28px">🧑🏻</span>
+                <span style="font-size:16px">🥉</span>
+                <span style="font-size:11px;font-weight:700">Reyaan</span>
+                <div class="podium-bar" style="height:55px;background:#B45309">2pts</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:14px;width:100%">
+              <button class="p-btn purple" style="border-radius:999px;flex:1;font-size:12px">🔄 Play Again</button>
+              <button class="p-btn orange" style="border-radius:999px;flex:1;font-size:12px">🏠 Home</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+</div>
+
+<!-- ═══════════════ TECH STACK ═══════════════ -->
+<div class="section" style="border-top:1px solid var(--border);padding-top:48px">
+  <div class="section-title">🛠️ How It's Built</div>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="t-icon">⚛️</div>
+      <div class="t-name">React Native Web</div>
+      <div class="t-desc">Makes the screens look great in a browser. All the buttons, animations, and colours.</div>
+    </div>
+    <div class="tech-card">
+      <div class="t-icon">🔌</div>
+      <div class="t-name">Socket.IO</div>
+      <div class="t-desc">Real-time connection between all players. When you answer, everyone sees it instantly.</div>
+    </div>
+    <div class="tech-card">
+      <div class="t-icon">🤖</div>
+      <div class="t-name">Azure OpenAI (gpt-4.1)</div>
+      <div class="t-desc">Makes 5–10 quiz questions about any topic you type in — completely automatically!</div>
+    </div>
+    <div class="tech-card">
+      <div class="t-icon">🟩</div>
+      <div class="t-name">Node.js Server</div>
+      <div class="t-desc">The "brain" behind the game. Tracks rooms, scores, and who answered what.</div>
+    </div>
+    <div class="tech-card">
+      <div class="t-icon">☁️</div>
+      <div class="t-name">Azure Cloud</div>
+      <div class="t-desc">Hosts the game online so anyone in the world can play — not just on your computer!</div>
+    </div>
+    <div class="tech-card">
+      <div class="t-icon">📄</div>
+      <div class="t-name">Session Logging</div>
+      <div class="t-desc">Every game is saved to a log file — so we can trace exactly what happened if something goes wrong.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PROGRESS CHECKLIST ═══════════════ -->
+<div class="section" style="border-top:1px solid var(--border);padding-top:48px">
+  <div class="section-title">✅ What's Done & What's Next</div>
+  <div class="checklist">
+    <div class="check-item done"><span class="check-icon">✅</span> Home screen with big Host and Join buttons</div>
+    <div class="check-item done"><span class="check-icon">✅</span> 5-step Host Setup wizard (topic, nickname, question count, leaderboard style, decorations)</div>
+    <div class="check-item done"><span class="check-icon">✅</span> Join screen with 4-digit room code</div>
+    <div class="check-item done"><span class="check-icon">✅</span> Step-by-step Avatar builder (skin tone, outfit, country/onesie)</div>
+    <div class="check-item done"><span class="check-icon">✅</span> Lobby with live player list, activity feed when someone joins</div>
+    <div class="check-item done"><span class="check-icon">✅</span> Real multiplayer — up to 10+ players at once</div>
+    <div class="check-item done"><span class="check-icon">✅</span> AI question generation with Azure OpenAI gpt-4.1</div>
+    <div class="check-item done"><span class="check-icon">✅</span> 2×2 quiz answer grid (Kahoot style)</div>
+    <div class="check-item done"><span class="check-icon">✅</span> Correct/wrong feedback with 🕺 and 💩 animations</div>
+    <div class="check-item done"><span class="check-icon">✅</span> Leaderboard after each question (or at the end)</div>
+    <div class="check-item done"><span class="check-icon">✅</span> Winner podium with gold/silver/bronze blocks</div>
+    <div class="check-item done"><span class="check-icon">✅</span> Play Again button for another round</div>
+    <div class="check-item done"><span class="check-icon">✅</span> Session log files for debugging</div>
+    <div class="check-item done"><span class="check-icon">✅</span> Config file so switching local/Azure is one line change</div>
+    <div class="check-item done"><span class="check-icon">✅</span> Azure Static Web Apps deployment (client)</div>
+    <div class="check-item todo"><span class="check-icon">🔄</span> Azure App Service deployment (server) — in progress</div>
+    <div class="check-item todo"><span class="check-icon">⏳</span> Fart sound 💩 when you get a wrong answer</div>
+    <div class="check-item todo"><span class="check-icon">⏳</span> Animated room decorations (animals wandering around lobby)</div>
+    <div class="check-item todo"><span class="check-icon">⏳</span> Custom QuizJex logo</div>
+  </div>
+</div>
+
+<!-- ═══════════════ HOW TO START ═══════════════ -->
+<div class="section" style="border-top:1px solid var(--border);padding-top:48px">
+  <div class="section-title">🚀 How to Start the Game (Local)</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px">
+      <div style="font-size:20px;font-weight:900;margin-bottom:12px">🖥️ Step 1 — Start the Server</div>
+      <div style="background:#0a1422;border-radius:10px;padding:14px;font-family:monospace;font-size:13px;color:#A78BFA">
+        cd C:\Users\prchugh\quizjex\server<br>
+        node index.js
+      </div>
+      <div style="color:#94A3B8;font-size:13px;margin-top:10px">You should see: 🎮 QuizJex running on http://localhost:3001</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px">
+      <div style="font-size:20px;font-weight:900;margin-bottom:12px">🌐 Step 2 — Start the App</div>
+      <div style="background:#0a1422;border-radius:10px;padding:14px;font-family:monospace;font-size:12px;color:#A78BFA">
+        Set-Location 'C:\Users\prchugh\quizjex\client'<br>
+        & ".\node_modules\.bin\expo.ps1" start --web --port 8081
+      </div>
+      <div style="color:#94A3B8;font-size:13px;margin-top:10px">Then open: <strong style="color:white">http://localhost:8081</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>QuizJex &nbsp;•&nbsp; <strong>Made by Reyaan 💛 to play with Goraansh</strong> &nbsp;•&nbsp; June 2026</p>
+  <p style="margin-top:8px">Built with React Native Web · Node.js · Socket.IO · Azure OpenAI gpt-4.1</p>
+</footer>
+
+</body>
+</html>

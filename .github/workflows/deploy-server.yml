@@ -2,7 +2,7 @@ name: Deploy Server to Azure
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - 'server/**'
       - '.github/workflows/deploy-server.yml'

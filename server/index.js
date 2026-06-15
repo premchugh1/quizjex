@@ -2,7 +2,7 @@
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
-const Database = require('better-sqlite3');
+const fs = require('fs');
 const path = require('path');
 const config = require('./config');
 const log = require('./logger');
@@ -16,49 +16,55 @@ const io = new Server(httpServer, {
   cors: { origin: config.clientOrigin, methods: ['GET', 'POST'] },
 });
 
-// -- SQLite setup -------------------------------------------------------------
-const DB_PATH = path.join(__dirname, 'rooms.db');
-const db = new Database(DB_PATH);
-db.exec(`CREATE TABLE IF NOT EXISTS rooms (
-  code TEXT PRIMARY KEY,
-  data TEXT NOT NULL,
-  updated_at INTEGER NOT NULL
-)`);
-// Clean up rooms older than 3 hours on startup
-db.prepare('DELETE FROM rooms WHERE updated_at < ?').run(Date.now() - 3 * 60 * 60 * 1000);
-log.info('SQLite ready', { path: DB_PATH });
-console.log('SQLite ready: ' + DB_PATH);
+// -- JSON file storage --------------------------------------------------------
+const DB_PATH = path.join(__dirname, 'rooms.json');
 
-// -- Room storage helpers -----------------------------------------------------
+function loadAll() {
+  try {
+    if (fs.existsSync(DB_PATH)) {
+      const raw = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+      const now = Date.now();
+      const valid = {};
+      Object.keys(raw).forEach((code) => {
+        if (raw[code].updatedAt > now - 3 * 60 * 60 * 1000) valid[code] = raw[code];
+      });
+      return valid;
+    }
+  } catch (e) { log.error('Failed to load rooms.json', { message: e.message }); }
+  return {};
+}
+
+function saveAll(store) {
+  try { fs.writeFileSync(DB_PATH, JSON.stringify(store), 'utf8'); }
+  catch (e) { log.error('Failed to save rooms.json', { message: e.message }); }
+}
+
+const store = loadAll();
+log.info('Room store loaded', { count: Object.keys(store).length });
+console.log('Room store loaded: ' + Object.keys(store).length + ' rooms');
+
 function roomToObj(room) {
   return { ...room, players: Object.fromEntries(room.players), answers: Object.fromEntries(room.answers) };
 }
 function objToRoom(obj) {
   return { ...obj, players: new Map(Object.entries(obj.players)), answers: new Map(Object.entries(obj.answers)) };
 }
-
-const getStmt  = db.prepare('SELECT data FROM rooms WHERE code = ?');
-const setStmt  = db.prepare('INSERT OR REPLACE INTO rooms (code, data, updated_at) VALUES (?, ?, ?)');
-const delStmt  = db.prepare('DELETE FROM rooms WHERE code = ?');
-const cntStmt  = db.prepare('SELECT COUNT(*) as n FROM rooms');
-
 function getRoom(code) {
-  const row = getStmt.get(code);
-  return row ? objToRoom(JSON.parse(row.data)) : null;
+  return store[code] ? objToRoom(store[code]) : null;
 }
 function saveRoom(code, room) {
-  setStmt.run(code, JSON.stringify(roomToObj(room)), Date.now());
+  store[code] = { ...roomToObj(room), updatedAt: Date.now() };
+  saveAll(store);
 }
 function deleteRoom(code) {
-  delStmt.run(code);
+  delete store[code];
+  saveAll(store);
 }
-function roomCount() {
-  return cntStmt.get().n;
-}
+function roomCount() { return Object.keys(store).length; }
 function generateCode() {
   let code;
   do { code = Math.floor(1000 + Math.random() * 9000).toString(); }
-  while (getRoom(code));
+  while (store[code]);
   return code;
 }
 
@@ -265,7 +271,7 @@ io.on('connection', (socket) => {
       setTimeout(() => deleteRoom(code), config.game.roomCloseDelaySec * 1000);
     } else {
       const leavingPlayer = room.players.get(socket.id);
-      log.info('Player left lobby', { code, nickname: leavingPlayer && leavingPlayer.nickname });
+      log.info('Player left', { code, nickname: leavingPlayer && leavingPlayer.nickname });
       room.players.delete(socket.id);
       saveRoom(code, room);
       io.to(code).emit('lobbyUpdate', { players: Array.from(room.players.values()) });
